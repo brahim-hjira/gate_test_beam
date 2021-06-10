@@ -1,0 +1,343 @@
+/vis/viewer/panTo -5 -1
+/vis/viewer/zoom 4.
+
+# V I E W E R #
+/vis/open OGL
+/vis/viewer/zoom 1.5
+# Set the viewing angle
+/vis/viewer/set/viewpointThetaPhi 5 60
+# Set the drawing style
+/vis/viewer/set/style surface
+
+/vis/drawVolume
+/vis/viewer/flush
+/tracking/storeTrajectory 1
+#/tracking/storeTrajectory 2
+/vis/scene/add/trajectories
+/vis/scene/add/axes
+/vis/scene/endOfEventAction accumulate -1
+
+
+#==============================================================================================
+# Verbose
+#==============================================================================================
+/gate/verbose Physic    1
+/gate/verbose Cuts      1
+/gate/verbose SD        0
+/gate/verbose Actions   0
+/gate/verbose Actor     0
+/gate/verbose Step      0
+/gate/verbose Error     1
+/gate/verbose Warning   1
+/gate/verbose Output    0
+/gate/verbose Beam      0
+/gate/verbose Volume    0
+/gate/verbose Image     0
+/gate/verbose Geometry  2
+/gate/verbose Core      1
+/run/verbose 2
+/event/verbose 0
+/tracking/verbose 0
+
+#/control/alias NPRIM 1000000
+
+
+#==============================================================================================
+# Materials
+#==============================================================================================
+
+/gate/geometry/setMaterialDatabase  data/GateMaterials.db
+
+
+#==============================================================================================
+# Geometry (world)
+#==============================================================================================
+
+/gate/world/setMaterial Air
+/gate/world/geometry/setXLength 300. cm
+/gate/world/geometry/setYLength 200. cm
+/gate/world/geometry/setZLength 200. cm
+
+
+#==============================================================================================
+# Objects  
+#==============================================================================================
+/gate/world/daughters/name V0
+/gate/world/daughters/insert box
+/gate/V0/geometry/setXLength 4. cm
+/gate/V0/geometry/setYLength 3. cm
+/gate/V0/geometry/setZLength 3. cm
+/gate/V0/placement/setTranslation 135.578 0. 0. cm
+/gate/V0/setMaterial Vacuum
+/gate/V0/vis/setColor white
+#----------------------------
+/gate/world/daughters/name V1
+/gate/world/daughters/insert box
+/gate/V1/geometry/setXLength 0.005 cm
+/gate/V1/geometry/setYLength 10. cm
+/gate/V1/geometry/setZLength 10. cm
+/gate/V1/placement/setTranslation 133.5755 0. 0. cm
+/gate/V1/setMaterial Titanium
+/gate/V1/vis/setColor white
+
+/gate/world/daughters/name V2
+/gate/world/daughters/insert cylinder
+/gate/V2/geometry/setRmax 40 mm
+/gate/V2/geometry/setRmin 1 mm
+/gate/V2/geometry/setHeight 11 mm
+/gate/V2/placement/setTranslation 133.023 0. 0. cm
+/gate/V2/placement/setRotationAxis 0 1 0
+/gate/V2/placement/setRotationAngle 90 deg
+/gate/V2/setMaterial Copper
+/gate/V2/vis/setColor red
+#----------------------------
+/gate/world/daughters/name V3
+/gate/world/daughters/insert box
+/gate/V3/geometry/setXLength 0.54 mm
+/gate/V3/geometry/setYLength 4.5 mm
+/gate/V3/geometry/setZLength 4.5 mm
+/gate/V3/placement/setTranslation 105.473 0. 0. cm
+/gate/V3/setMaterial Diamant
+/gate/V3/vis/setColor white
+#----------------------------
+/gate/world/daughters/name V4
+/gate/world/daughters/insert box
+/gate/V4/geometry/setXLength 0.54 mm
+/gate/V4/geometry/setYLength 4.5 mm
+/gate/V4/geometry/setZLength 4.5 mm
+/gate/V4/placement/setTranslation 105.099 0. 0. cm
+/gate/V4/setMaterial Diamant
+/gate/V4/vis/setColor white
+#---------------------------
+/gate/world/daughters/name V5
+/gate/world/daughters/insert box
+/gate/V5/geometry/setXLength 12. cm
+/gate/V5/geometry/setYLength 11. cm
+/gate/V5/geometry/setZLength 5. cm
+/gate/V5/placement/setTranslation -9. 3. 15. cm
+/gate/V5/placement/setRotationAxis 0 1 0
+/gate/V5/placement/setRotationAngle 45 deg
+/gate/V5/setMaterial Lead
+/gate/V5/vis/setColor white
+#----------------------------
+/gate/world/daughters/name V6
+/gate/world/daughters/insert box
+/gate/V6/geometry/setXLength 5. cm
+/gate/V6/geometry/setYLength 5. cm
+/gate/V6/geometry/setZLength 5. cm
+/gate/V6/placement/setTranslation -20. 0. 0. cm
+/gate/V6/setMaterial Pmma
+/gate/V6/vis/setColor red
+#----------------------------
+/gate/world/daughters/name V7
+/gate/world/daughters/insert box
+/gate/V7/geometry/setXLength 3.1 cm
+/gate/V7/geometry/setYLength 2. cm
+/gate/V7/geometry/setZLength 3.1 cm
+/gate/V7/placement/setTranslation 0. 0. 27.2 cm
+/gate/V7/setMaterial CeBr3
+/gate/V7/vis/setColor red
+#---------------------------
+/gate/world/daughters/name V8
+/gate/world/daughters/insert box
+/gate/V8/geometry/setXLength 3.1 cm
+/gate/V8/geometry/setYLength 2. cm
+/gate/V8/geometry/setZLength 3.1 cm
+/gate/V8/placement/setTranslation 15. 0. 27.2 cm
+/gate/V8/setMaterial CeBr3
+/gate/V8/vis/setColor red
+#---------------------------
+/gate/world/daughters/name V9
+/gate/world/daughters/insert box
+/gate/V9/geometry/setXLength 50. cm
+/gate/V9/geometry/setYLength 1. cm
+/gate/V9/geometry/setZLength 90. cm
+/gate/V9/placement/setTranslation 0. -3. 0. cm
+/gate/V9/setMaterial Aluminium
+/gate/V9/vis/setColor white
+#==============================================================================================
+#    Electromagnetic  physics list
+#==============================================================================================
+/gate/physics/addPhysicsList QGSP_BIC_HP
+/gate/physics/addProcess RadioactiveDecay
+#/gate/physics/addPhysicsList emstandard_opt4
+/gate/physics/addProcess HadronIonisation proton
+
+/gate/physics/addProcess NeutronCapture
+/gate/physics/processes/NeutronCapture/setModel G4LCapture
+
+/gate/physics/addProcess NeutronInelastic
+/gate/physics/processes/NeutronInelastic/setModel PreCompound
+#=====================================================
+# CUTS
+#=====================================================
+/gate/physics/setEMin 0.1 keV
+/gate/physics/setEMax 10 GeV
+/gate/physics/setDEDXBinning 350
+/gate/physics/setLambdaBinning 350
+#
+
+/gate/physics/Gamma/SetCutInRegion      world 3 m
+/gate/physics/Electron/SetCutInRegion   world 2 m
+/gate/physics/Positron/SetCutInRegion   world 2 m
+
+#---------------------------------------
+/gate/physics/Gamma/SetCutInRegion      V7 100 um
+/gate/physics/Electron/SetCutInRegion   V7 100 um
+/gate/physics/Positron/SetCutInRegion   V7 100 um
+/gate/physics/SetMaxStepSizeInRegion    V7 2 m
+#---------------------------------------
+/gate/physics/Gamma/SetCutInRegion      V8 100 um
+/gate/physics/Electron/SetCutInRegion   V8 100 um
+/gate/physics/Positron/SetCutInRegion   V8 100 um
+/gate/physics/SetMaxStepSizeInRegion    V8 2 m
+#---------------------------------------
+
+#---------------------------------------
+/gate/physics/Gamma/SetCutInRegion      V6 100 um
+/gate/physics/Electron/SetCutInRegion   V6 100 um
+/gate/physics/Positron/SetCutInRegion   V6 100 um
+/gate/physics/SetMaxStepSizeInRegion    V6 2 m
+#--------------------------------------
+/gate/physics/displayCuts
+#==============================================================================================
+# ACTORS
+#==============================================================================================
+/gate/actor/addActor DoseActor Dyz2
+/gate/actor/Dyz2/save output/map2d_Dyz2.root
+/gate/actor/Dyz2/attachTo V2
+/gate/actor/Dyz2/setSize 1.1 8 8 cm
+/gate/actor/Dyz2/setResolution 1 100 100
+
+/gate/actor/Dyz2/enableEdep              true
+/gate/actor/Dyz2/enableUncertaintyEdep   true
+/gate/actor/Dyz2/enableSquaredEdep       true
+/gate/actor/Dyz2/enableDose              true
+/gate/actor/Dyz2/enableUncertaintyDose   true
+/gate/actor/Dyz2/enableSquaredDose       true
+/gate/actor/Dyz2/enableNumberOfHits      true
+#*************
+/gate/actor/addActor DoseActor Dyz4
+/gate/actor/Dyz4/save output/map2d_Dyz4.root
+/gate/actor/Dyz4/attachTo V4
+/gate/actor/Dyz4/setSize 0.54 4.5 4.5 mm
+/gate/actor/Dyz4/setResolution 1 100 100
+
+/gate/actor/Dyz4/enableEdep              true
+/gate/actor/Dyz4/enableUncertaintyEdep   true
+/gate/actor/Dyz4/enableSquaredEdep       true
+/gate/actor/Dyz4/enableDose              true
+/gate/actor/Dyz4/enableUncertaintyDose   true
+/gate/actor/Dyz4/enableSquaredDose       true
+/gate/actor/Dyz4/enableNumberOfHits      true
+#*************
+/gate/actor/addActor DoseActor Dxy6
+/gate/actor/Dxy6/save output/map2d_Dxy6.root
+/gate/actor/Dxy6/attachTo V6
+/gate/actor/Dxy6/setSize 5 5 5 cm
+/gate/actor/Dxy6/setResolution 100 100 1
+
+/gate/actor/Dxy6/enableEdep              true
+/gate/actor/Dxy6/enableUncertaintyEdep   true
+/gate/actor/Dxy6/enableSquaredEdep       true
+/gate/actor/Dxy6/enableDose              true
+/gate/actor/Dxy6/enableUncertaintyDose   true
+/gate/actor/Dxy6/enableSquaredDose       true
+/gate/actor/Dxy6/enableNumberOfHits      true
+#*************
+/gate/actor/addActor DoseActor Dyz6
+/gate/actor/Dyz6/save output/map2d_Dyz6.root
+/gate/actor/Dyz6/attachTo V6
+/gate/actor/Dyz6/setSize 5 5 5 cm
+/gate/actor/Dyz6/setResolution 1 100 100
+
+/gate/actor/Dyz6/enableEdep              true
+/gate/actor/Dyz6/enableUncertaintyEdep   true
+/gate/actor/Dyz6/enableSquaredEdep       true
+/gate/actor/Dyz6/enableDose              true
+/gate/actor/Dyz6/enableUncertaintyDose   true
+/gate/actor/Dyz6/enableSquaredDose       true
+/gate/actor/Dyz6/enableNumberOfHits      true
+#*************
+#*************
+
+#*************
+
+#*************
+#*************
+/gate/actor/addActor DoseActor Dxy7
+/gate/actor/Dxy7/save output/map2d_Dxy7.root
+/gate/actor/Dxy7/attachTo V7
+/gate/actor/Dxy7/setSize 3.1 3.1 2. cm
+/gate/actor/Dxy7/setResolution 100 100 1
+
+/gate/actor/Dxy7/enableEdep              true
+/gate/actor/Dxy7/enableUncertaintyEdep   true
+/gate/actor/Dxy7/enableSquaredEdep       true
+/gate/actor/Dxy7/enableDose              true
+/gate/actor/Dxy7/enableUncertaintyDose   true
+/gate/actor/Dxy7/enableSquaredDose       true
+/gate/actor/Dxy7/enableNumberOfHits      true
+#*************
+/gate/actor/addActor DoseActor Dxy8
+/gate/actor/Dxy8/save output/map2d_Dxy8.root
+/gate/actor/Dxy8/attachTo V8
+/gate/actor/Dxy8/setSize 3.1 3.1 2. cm
+/gate/actor/Dxy8/setResolution 100 100 1
+
+/gate/actor/Dxy8/enableEdep              true
+/gate/actor/Dxy8/enableUncertaintyEdep   true
+/gate/actor/Dxy8/enableSquaredEdep       true
+/gate/actor/Dxy8/enableDose              true
+/gate/actor/Dxy8/enableUncertaintyDose   true
+/gate/actor/Dxy8/enableSquaredDose       true
+/gate/actor/Dxy8/enableNumberOfHits      true
+#==============================
+#/gate/actor/addActor KillActor      killV2
+#/gate/actor/killV2/save             killV2.txt
+#/gate/actor/killV2/attachTo         V2
+#-----------------------------
+#/gate/actor/addActor KillActor      killV3
+#/gate/actor/killV3/save             killV3.txt
+#/gate/actor/killV3/attachTo         V3
+#-----------------------------
+#/gate/actor/addActor KillActor      killV4
+#/gate/actor/killV4/save             killV4.txt
+#/gate/actor/killV4/attachTo         V4
+#==============================================================================================
+# Initialisation
+#==============================================================================================
+
+/gate/run/initialize 
+
+#==============================================================================================
+# Source
+#==============================================================================================
+/gate/source/addSource PBS PencilBeam
+/gate/source/PBS/setParticleType proton
+/gate/source/PBS/setEnergy 64.5 MeV
+/gate/source/PBS/setSigmaEnergy 1.0 MeV
+/gate/source/PBS/setPosition 135.578 0. 0. cm
+/gate/source/PBS/setSigmaX 0.8 mm
+/gate/source/PBS/setSigmaY 0.8 mm
+/gate/source/PBS/setSigmaTheta 3.3 mrad
+/gate/source/PBS/setSigmaPhi 3.8 mrad
+/gate/source/PBS/setEllipseXThetaEmittance 8.2 mm*mrad
+/gate/source/PBS/setEllipseXThetaRotationNorm negative
+/gate/source/PBS/setEllipseYPhiEmittance 8.2 mm*mrad
+/gate/source/PBS/setEllipseYPhiRotationNorm negative
+/gate/source/PBS/setRotationAxis 0 1 0
+/gate/source/PBS/setRotationAngle -90 deg
+
+#==============================================================================================
+# Main program
+#==============================================================================================
+
+/gate/output/allowNoOutput
+
+/gate/application/setTotalNumberOfPrimaries {NPRIM}
+/gate/application/start
+
+
+
+

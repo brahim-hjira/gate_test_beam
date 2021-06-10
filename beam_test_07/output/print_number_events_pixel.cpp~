@@ -1,0 +1,178 @@
+#include "Riostream.h"
+#include "TRint.h"
+#include "TGApplication.h"
+#include "TStopwatch.h"
+#include "TRandom3.h"
+#include "TCanvas.h"
+#include "TH1.h"
+#include "TH2.h"
+#include "TH3.h"
+#include "TF1.h"
+#include "TMath.h"
+#include "TSystem.h"
+#include "TStyle.h"
+#include <algorithm>
+
+#include "TGaxis.h"
+#include "TRandom.h"
+using namespace std;
+
+//===========================================
+void print_number_events_pixel(){
+ gStyle->SetOptStat(kFALSE);
+
+ gStyle-> SetOptStat(000);
+
+int number_pixels_axis=64;
+//int n;
+//cout<<" Enter number to divide by Dmax . or 0 : to divide by D50 "<<endl;
+//cin>>n;
+gStyle-> SetOptStat(000);
+float thickness=31.;
+TCanvas* c1= new TCanvas("c1"," ", 1600, 1000);
+TCanvas* Global=new TCanvas("","", 1600, 1000);
+TH1D* Map1D_MC = new TH1D("Map1D", " ",number_pixels_axis,0. ,31.);
+TH1D* Map1D_EX = new TH1D("Map1D", " ",number_pixels_axis,0. ,31.);
+TH1D* Map_RE = new TH1D("Map1D", " ",number_pixels_axis,0. ,31.);
+//
+   TPad *pad1 = new TPad("pad1","",0,0,1,1);
+   TPad *pad2 = new TPad("pad2","",0,0,1,1);
+   pad2->SetFillColor(0);
+   pad2->SetFillStyle(4000);
+   pad2->SetFrameFillStyle(0);
+   //pad2->SetAxisColor(kYellow,"Y");
+   pad1->Draw();
+   pad1->cd();
+
+ifstream mc1("mc_1330.txt"),file2("CC_1D_Co_1330.txt");
+//dose_mc_1770
+//dose_mc_1330
+//profile_1d_EX
+//1173.2;
+//1332.5;
+//map1d_xy_dose_mc-Edep-511.txt
+//map1d_xy_dose_mc-Edep-1275.txt
+
+double number_events_pixel_MC[number_pixels_axis], number_events_pixel_EX[number_pixels_axis], relative_error[number_pixels_axis], sum_MC=0,sum_EX=0;
+
+
+    if(mc1.is_open())
+    {
+		  string ligne; // variable contenant chaque ligne lue
+		  for (int i = 1; i<=6; i++)
+		  {
+		    getline(mc1, ligne );
+		  }
+
+	    for(int i = 0; i < number_pixels_axis; ++i)
+	    {
+		mc1 >> number_events_pixel_MC[i];
+		sum_MC+=number_events_pixel_MC[i];
+	      //cout<<i+1<<" ; "<<number_events_pixel_MC[i]<<" ; "<<sum_MC<<endl;
+	    }
+    }
+
+
+reverse(number_events_pixel_MC, number_events_pixel_MC + number_pixels_axis);
+//-------------------------------------------------------------
+	for(int i = 0; i < number_pixels_axis; ++i)
+	{
+	 number_events_pixel_MC[i]=number_events_pixel_MC[i]/sum_MC;
+	 Map1D_MC->Fill((31./64.)*(i),number_events_pixel_MC[i]) ;
+	  cout<<i+1<<" mc ; "<<number_events_pixel_MC[i]<<endl;
+	}
+
+//======*****************************===================**************************=======
+
+    if(file2.is_open())
+    {         /*
+		 string ligne; // variable contenant chaque ligne lue
+		  for (int i = 1; i<=6; i++)
+		  {
+		    getline(file2, ligne );
+		  }
+		 */
+
+	    for(int i = 0; i < number_pixels_axis; ++i)
+	    {
+		file2 >> number_events_pixel_EX[i];
+		sum_EX+=number_events_pixel_EX[i];
+	   // cout<<i+1<<" ; "<<number_events_pixel_EX[i]<<endl;
+	    }
+    }
+
+
+//-------------------------------------------------------------
+	for(int i = 0; i < number_pixels_axis; ++i)
+	{
+	 number_events_pixel_EX[i]=number_events_pixel_EX[i]/sum_EX;
+	 Map1D_EX->Fill((31./64.)*(i),number_events_pixel_EX[i]) ;
+	//cout<<i+1<<" ex ; "<<number_events_pixel_EX[i]<<endl;
+	}
+//======================relative_error=========================
+	for(int i = 0; i < number_pixels_axis; ++i)
+	{
+	    relative_error[i]=abs((number_events_pixel_EX[i]-number_events_pixel_MC[i])*100)/(number_events_pixel_MC[i]);
+	    Map_RE->Fill((31./64.)*(i),relative_error[i]) ;
+
+       cout<<i<<" ; "<<relative_error[i]<<endl;
+	}
+
+double max_MC = *max_element(number_events_pixel_MC, number_events_pixel_MC + number_pixels_axis);
+double max_EX = *max_element(number_events_pixel_EX, number_events_pixel_EX + number_pixels_axis);
+double max_RE = *max_element(relative_error, relative_error + number_pixels_axis);
+double max= max_EX;
+if (max_MC>max){
+    max=max_MC;
+}
+
+
+Map1D_MC->SetLineWidth(4);
+Map1D_MC->SetLineColor(kBlue);
+//Map1D_MC->GetYaxis()->SetRangeUser(0.0, 1.1*max);
+//
+Map1D_EX->SetTitle(";Y [mm]; PDD");
+Map1D_EX->GetXaxis()->SetLabelFont(22);
+Map1D_EX->GetXaxis()->SetTitleFont(22);
+Map1D_EX->GetYaxis()->SetLabelFont(22);
+Map1D_EX->GetYaxis()->SetTitleFont(22);
+Map1D_EX->SetLineWidth(4);
+Map1D_EX->SetLineColor(kBlue);
+
+
+//
+
+Map1D_EX->Draw("hist ");
+//Map1D_EX->GetYaxis()->SetRangeUser(0.0, 1.1*max);
+Map1D_EX->SetLineWidth(4);
+Map1D_EX->SetLineColor(kRed);
+Map1D_MC->Draw("hist same ");
+
+//pad2->Draw();
+//pad2->cd();
+//Map_RE->Draw("hist  Y+");
+//Map_RE->GetYaxis()->SetRangeUser(0.0, 102);
+//
+//Map_RE->Draw("HIST  same ");
+//->SetTitle(";X [mm]; PDD");
+Map_RE->GetXaxis()->SetLabelFont(22);
+Map_RE->GetXaxis()->SetTitleFont(22);
+Map_RE->GetYaxis()->SetLabelFont(22);
+Map_RE->GetYaxis()->SetTitleFont(22);
+Map_RE->SetLineWidth(4);
+Map_RE->SetLineColor(kBlue);
+///
+//Map_RE->SetAxisColor(kBlue,"Y+");
+//Map_RE->SetTitleOffset(1.4,"Y+");
+//Map_RE->SetLabelColor(kBlue,"Y+");
+//Map_RE->SetLineStyle(7);
+//---------------------------------
+auto legend = new TLegend(0.5,0.6,0.3,0.7);
+legend->SetHeader("P Irr YZ1, Co-60, 1332.5 keV");
+
+legend->AddEntry(Map1D_MC,"Monte Carlo ","l");//1275 keV
+legend->AddEntry(Map1D_EX,"Experimental ","l");//511 keV
+//legend->AddEntry(Map_RE,"Relative error [%] ","l");
+legend->Draw();
+
+}

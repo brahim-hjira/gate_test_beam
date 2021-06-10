@@ -1,0 +1,176 @@
+#include "Riostream.h"
+#include "TRint.h"
+#include "TGApplication.h"
+#include "TStopwatch.h"
+#include "TRandom3.h"
+#include "TCanvas.h"
+#include "TH1.h"
+#include "TH2.h"
+#include "TH3.h"
+#include "TF1.h"
+#include "TMath.h"
+#include "TSystem.h"
+#include "TStyle.h"
+#include <algorithm>
+
+#include "TGaxis.h"
+#include "TRandom.h"
+using namespace std;
+
+//===========================================
+void pro (){
+gStyle->SetOptStat(kFALSE);
+
+gStyle-> SetOptStat(000);
+float thickness=31.,max_EX,max_MC,Max,sum_EX=0,sum_MC=0;
+TH2D* Map2D_EX;
+TH2D* Map2D_MC;
+TH1D* Map1D_MC;
+TH1D* Map1D_EX;
+//=========================================
+
+
+//===============================================
+        string rootfilename1 = "/home/hjira/calibration/output/output_root/calibration.root";
+    	TFile* f1 = new TFile(rootfilename1.c_str());
+    	f1->ls();
+
+        if (f1->IsZombie()) {
+               std::cout << "Error opening file" << std::endl;
+        }
+        else{
+            std::cout<<"File is opened"<< std::endl;
+        }
+
+Map2D_EX = (TH2D*)f1->Get("CC_14_die");
+//------------------------------------------------
+        string rootfilename2 = "/home/hjira/gate_project/project_1_det/output/map2d_xy_dose_mc_511_XY-Edep.root";
+    	TFile* f2 = new TFile(rootfilename2.c_str());
+    	f2->ls();
+
+        if (f2->IsZombie()) {
+               std::cout << "Error opening file" << std::endl;
+        }
+        else{
+            std::cout<<"File is opened"<< std::endl;
+        }
+
+Map2D_MC = (TH2D*)f2->Get("histo");
+//===============================================
+const int nbins = Map1D_MC->GetXaxis()->GetNbins();
+Map1D_MC=Map2D_MC->ProjectionX();
+Map1D_MC->GetXaxis()->Set (64, 0., 31.);
+Map1D_EX=Map2D_EX->ProjectionX();
+//Map2D_EX->Draw("colz");
+//Map1D_MC->Draw("hist");
+
+//TH1D* Map1D_MC = new TH1D("Map1D", " ",nbins,0. ,31.);
+TH1D* Map1D_RE = new TH1D("Map1D", " ",64,0. ,31.);
+double MC[nbins],EX[nbins],RE[nbins],x;
+//***************************************************
+
+
+//reverse(MC, MC + nbins+2);
+
+//**************************************
+sum_EX = Map1D_EX->Integral();
+sum_MC = Map1D_MC->Integral();
+//======================================
+//cout<<sum_EX<<endl;
+Map1D_EX->Scale(1/sum_EX);
+Map1D_MC->Scale(1/sum_MC);
+
+
+
+
+//===============================
+max_EX=Map1D_EX->GetMaximum();
+max_MC=Map1D_MC->GetMaximum();
+double max= max_EX;
+if (max_MC>max){
+    max=max_MC;
+    }
+
+Map1D_MC->GetYaxis()->SetRangeUser(0.0, 1.01*max);
+Map1D_EX->GetYaxis()->SetRangeUser(0.0, 1.01*max);
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Map1D_EX->SetTitle(";X [mm] ; PDD");
+Map1D_EX->GetXaxis()->SetLabelFont(22);
+Map1D_EX->GetXaxis()->SetTitleFont(22);
+Map1D_EX->GetYaxis()->SetLabelFont(22);
+Map1D_EX->GetYaxis()->SetTitleFont(22);
+Map1D_EX->SetLineWidth(3);
+Map1D_EX->SetLineColor(kRed);
+//
+Map1D_MC->GetXaxis()->SetLabelFont(22);
+Map1D_MC->GetXaxis()->SetTitleFont(22);
+Map1D_MC->GetYaxis()->SetLabelFont(22);
+Map1D_MC->GetYaxis()->SetTitleFont(22);
+Map1D_MC->SetLineWidth(3);
+Map1D_MC->SetLineColor(kBlack);
+//
+Map1D_RE->SetAxisColor(kBlue,"Y+");
+Map1D_RE->SetTitleOffset(1.4,"Y+");
+Map1D_RE->SetLabelColor(kBlue,"Y+");
+//Map1D_RE->SetLineStyle(7);
+Map1D_RE->SetLineWidth(2);
+Map1D_RE->SetLineColor(kBlue);
+Map1D_RE->GetYaxis()->SetRangeUser(-100,100);
+//----------------
+Map1D_RE->GetXaxis()->SetLabelFont(22);
+Map1D_RE->GetXaxis()->SetTitleFont(22);
+Map1D_RE->GetYaxis()->SetLabelFont(22);
+Map1D_RE->GetYaxis()->SetTitleFont(22);
+
+
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++  
+
+ for(int i=1;i<=64;i++)
+ {
+ 
+ x = (Map1D_EX->GetBinContent(i)-Map1D_MC->GetBinContent(i))*100/Map1D_MC->GetBinContent(i); 
+ cout<<i<<" , "<< x<<endl;
+ Map1D_RE->SetBinContent(i,x);
+ }
+//====================================================
+
+   TPad *pad1 = new TPad("pad1","",0,0,1,1);
+   TPad *pad2 = new TPad("pad2","",0,0,1,1);
+   pad2->SetFillColor(1);
+   pad2->SetFillStyle(4000);
+   pad2->SetFrameFillStyle(1);
+   pad1->Draw();
+   pad1->cd();
+   
+ Map1D_EX->Draw("hist");  
+  Map1D_MC->Draw("hist same");    
+   
+   
+   pad2->Draw();
+   pad2->cd();
+
+Map1D_RE->Draw("hist  Y+");
+
+//============
+auto legend = new TLegend(0.5,0.6,0.3,0.7);
+legend->SetHeader("Irr plan: YZ1, Na-22, 511 keV");
+
+legend->AddEntry(Map1D_MC,"Monte Carlo ","l");//1275 keV
+legend->AddEntry(Map1D_EX,"Experimental ","l");//511 keV
+legend->AddEntry(Map1D_RE,"Relative error [%] ","l");
+legend->Draw();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+}
